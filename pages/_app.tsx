@@ -17,7 +17,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   
   return (
     <>
-      <Toaster/>
+      <Toaster />
       <Head>
         <title>{pageProps.title}</title>
       </Head>

@@ -90,7 +90,7 @@ export default async function Open(
     new ethers.Wallet(
       process.env.WALLET_PRIVATE_KEY as string,
       //polygon mumbai network
-      ethers.getDefaultProvider("https://rpc-mumbai-maticvigil.com")
+      ethers.getDefaultProvider("https://rpc-mumbai.maticvigil.com")
     ),
   );
 
