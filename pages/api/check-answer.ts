@@ -1,6 +1,11 @@
 import quizQuestions from "../../lib/questions";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ethers, BigNumber } from "ethers";
+import { packAddress } from "../../lib/contractAddress";
+import { ThirdwebProvider } from "@3rdweb/react";
+import { ThirdwebSDK } from "@3rdweb/sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
 export type CheckAnswerPayload = {
   questionIndex: number;
@@ -81,6 +86,21 @@ export default async function Open(
   }
 
   // If we get here then the answer was correct
+  const sdk = new ThirdwebSDK(
+    new ethers.Wallet(
+      process.env.WALLET_PRIVATE_KEY as string,
+      //polygon mumbai network
+      ethers.getDefaultProvider("https://rpc-mumbai-maticvigil.com")
+    ),
+  );
+
+  //transfer a copy of the pack to the user
+  console.log('Transferring a pack to 💌  :', address,"...");
+  const packModule = sdk.getPackModule(packAddress);
+  const packTokenId = '0';
+
+  //Note that this is async
+  packModule.transfer(address, packTokenId, BigNumber.from(1));
 
   // TODO: send the reward!
 
