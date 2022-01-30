@@ -1,3 +1,9 @@
+import { useWeb3 } from "@3rdweb/hooks";
+import { ThirdwebSDK } from "@3rdweb/sdk";
+import type { PackMetadataWithBalance } from "@3rdweb/sdk";
+import { useEffect,useState } from "react";
+import { packAddress } from "../lib/contractAddress";
+
 export function getStaticProps() {
   return {
     props: {
