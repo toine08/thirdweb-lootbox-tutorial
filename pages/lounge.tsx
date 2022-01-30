@@ -50,7 +50,7 @@ export default function Lounge() {
   }, [address]);
 
   useEffect(()=>{
-    if (provider){
+    if (signer){
       sdk.setProviderOrSigner(signer)
     }
   }, [signer]);
