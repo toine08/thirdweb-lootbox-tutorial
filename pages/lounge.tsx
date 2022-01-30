@@ -1,8 +1,8 @@
 import { useWeb3 } from "@3rdweb/hooks";
-import { BundleMetadata, ThirdwebSDK } from "@3rdweb/sdk";
+import { BundleMetadata, BundleModule, ThirdwebSDK } from "@3rdweb/sdk";
 import type { PackMetadataWithBalance } from "@3rdweb/sdk";
 import { useEffect,useState } from "react";
-import { packAddress } from "../lib/contractAddress";
+import { bundleAddress, packAddress } from "../lib/contractAddress";
 import NFT from "../components/nfts";
 import OpenButton from "../components/open-button";
 export function getStaticProps() {
@@ -22,12 +22,17 @@ export default function Lounge() {
 
   const sdk = new ThirdwebSDK("https://rpc-mumbai.maticvigil.com")
   const packModule = sdk.getPackModule(packAddress);
+  const bundleModule = sdk.getBundleModule(bundleAddress);
 
 
   async function getNfts(){
-    const fetchedPackNfts = await packModule.getOwned(address);
-    console.log(fetchedPackNfts);
+    const [fetchedPackNfts, fetchedBundleNfts] = await Promise.all([
+      packModule.getOwned(address),
+      bundleModule.getOwned(address),
+    ])
+    console.log({fetchedPackNfts, fetchedBundleNfts});
     setPackNfts(fetchedPackNfts);
+    setBundleNfts(fetchedBundleNfts);
   }
 
   async function getNftsWithLoading(){
@@ -63,7 +68,7 @@ export default function Lounge() {
       </svg>
     )
   }
-  if (packNfts.length === 0) {
+  if (packNfts.length === 0 && bundleNfts.length === 0) {
     return <p>You need to own some NFTs to access the lounge! 🤷‍♂️</p>
   }
   return(
@@ -80,7 +85,19 @@ export default function Lounge() {
         </div>
       </div>
     )}
-
+    {bundleNfts.length > 0 && (
+  <div>
+    <h2 className="text-4xl font-bold">Your Collection</h2>
+    <div className="grid grid-cols-2 md:grid-cols-3 mt-4 gap-2">
+      {bundleNfts.map((nft) => (
+        <div className="border border-blue-500 rounded-lg p-4" key={nft.metadata.id}>
+          <NFT metadata={nft.metadata} />
+          <p className="text-gray-800">Balance: {nft.ownedByAddress.toString()}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)} 
     <div>
       <h2 className="text-4xl font-bold">Some secret content!</h2>
       <p>This content is only available to users with NFTs! 🤫</p>
