@@ -30,7 +30,7 @@ export default function usePackEvents(){
                     </p>
                   </div>,
                   {
-                    duration: 5000,
+                    duration: 50,
                   }
                 );
               }
