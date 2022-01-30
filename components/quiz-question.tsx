@@ -1,12 +1,15 @@
 import axios from "axios";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useWeb3 } from "@3rdweb/hooks";
 import {
   CheckAnswerPayload,
   CheckAnswerResponse,
 } from "../pages/api/check-answer";
 import PrimaryButton from "./primary-button";
 import invariant from "tiny-invariant";
+
+
 
 type Props = {
   questionIndex: number;
@@ -17,6 +20,7 @@ type Props = {
 };
 
 type AnswerResult = "correct" | "incorrect";
+
 
 export default function QuizQuestion({
   questionIndex,
@@ -34,20 +38,26 @@ export default function QuizQuestion({
   const [correctAnswerWas, setCorrectAnswerWas] = useState<number | undefined>(
     undefined
   );
+  const { address, provider } = useWeb3();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-
+    invariant(provider !== undefined, "Provider must be defined to submit answer! ");
     try {
       invariant(
         answerIndex !== undefined,
         "Answer index is required to submit"
       );
 
+      const message = "Please sign this message to confirm your identity and submit the answer.This won't cost any gas!"
+      const signedMessage = await provider.getSigner().signMessage(message)
+
       const payload: CheckAnswerPayload = {
         questionIndex,
         answerIndex,
+        message,
+        signedMessage,
       };
 
       const checkResponse = await axios.post("/api/check-answer", payload);
@@ -111,7 +121,9 @@ export default function QuizQuestion({
       </>
     );
   };
-
+  if(!address){
+    return<p>Please connect your wallet to take the quiz</p>
+  }
   return (
     <form>
       <div className="flex flex-col gap-4">
